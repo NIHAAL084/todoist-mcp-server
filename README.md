@@ -1,4 +1,4 @@
-# @nihaal084/todoist-mcp-server (Gemini-Compatible)
+# @nihaal084/todoist-mcp-server (ADK-Compatible)
 
 **Fixed version with Google Gemini API compatibility**
 
