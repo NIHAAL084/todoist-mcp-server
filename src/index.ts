@@ -29,7 +29,7 @@ const CREATE_TASK_TOOL: Tool = {
         description: "Natural language due date like 'tomorrow', 'next Monday', 'Jan 23' (optional)"
       },
       priority: {
-        type: "number",
+        type: "string",
         description: "Task priority from 1 (normal) to 4 (urgent) (optional)",
         enum: ["1", "2", "3", "4"]
       }
@@ -53,14 +53,14 @@ const GET_TASKS_TOOL: Tool = {
         description: "Natural language filter like 'today', 'tomorrow', 'next week', 'priority 1', 'overdue' (optional)"
       },
       priority: {
-        type: "number",
+        type: "string",
         description: "Filter by priority level (1-4) (optional)",
         enum: ["1", "2", "3", "4"]
       },
       limit: {
-        type: "number",
+        type: "string",
         description: "Maximum number of tasks to return (optional)",
-        default: 10
+        default: "10"
       }
     }
   }
@@ -89,7 +89,7 @@ const UPDATE_TASK_TOOL: Tool = {
         description: "New due date in natural language like 'tomorrow', 'next Monday' (optional)"
       },
       priority: {
-        type: "number",
+        type: "string",
         description: "New priority level from 1 (normal) to 4 (urgent) (optional)",
         enum: ["1", "2", "3", "4"]
       }
@@ -156,7 +156,7 @@ function isCreateTaskArgs(args: unknown): args is {
   content: string;
   description?: string;
   due_string?: string;
-  priority?: number;
+  priority?: string;
 } {
   return (
     typeof args === "object" &&
@@ -169,8 +169,8 @@ function isCreateTaskArgs(args: unknown): args is {
 function isGetTasksArgs(args: unknown): args is {
   project_id?: string;
   filter?: string;
-  priority?: number;
-  limit?: number;
+  priority?: string;
+  limit?: string;
 } {
   return (
     typeof args === "object" &&
@@ -183,7 +183,7 @@ function isUpdateTaskArgs(args: unknown): args is {
   content?: string;
   description?: string;
   due_string?: string;
-  priority?: number;
+  priority?: string;
 } {
   return (
     typeof args === "object" &&
@@ -271,8 +271,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       // Apply limit
-      if (args.limit && args.limit > 0) {
-        filteredTasks = filteredTasks.slice(0, args.limit);
+      const Limit = args.limit ? parseInt(args.limit.toString(), 10) : undefined;
+      if (Limit && Limit > 0) {
+        filteredTasks = filteredTasks.slice(0, Limit);
       }
 
       const taskList = filteredTasks.map(task =>
